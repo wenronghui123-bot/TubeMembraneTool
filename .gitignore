@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+python-embed/
+projects/
+reports/output/
+*.log
+error_log.txt
+_desktop_screenshot.png
+_temp_docs/
+_unisol_docs/
+*.bat
+start.bat
+ui/
+main.py
+README.md
