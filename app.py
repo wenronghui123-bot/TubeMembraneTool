@@ -1,4 +1,4 @@
-"""
+﻿"""
 管式膜设计计算工具 - Streamlit 浏览器版
 运行: streamlit run app.py
 """
@@ -17,16 +17,61 @@ from core.bubble_point_calc import record_bubble_point_test, batch_test_summary
 from core.bom_calc import create_bom_from_results
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
+# GitHub API helpers for cloud persistence
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
+GITHUB_REPO = "wenronghui123-bot/TubeMembraneTool"
+GITHUB_API = f"https://api.github.com/repos/{GITHUB_REPO}/contents"
+IS_CLOUD = os.environ.get("STREAMLIT_SHARING_MODE") is not None or GITHUB_TOKEN != ""
+
+def _cloud_load(filename):
+    """Load a JSON file from GitHub repo (cloud mode)"""
+    import requests
+    url = f"{GITHUB_API}/{filename}"
+    headers = {"Authorization": f"token {GITHUB_TOKEN}"} if GITHUB_TOKEN else {}
+    try:
+        r = requests.get(url, headers=headers, timeout=10)
+        if r.status_code == 200:
+            import base64
+            content = base64.b64decode(r.json()["content"]).decode()
+            return json.loads(content)
+    except Exception:
+        pass
+    return None
+
+def _cloud_save(filename, data, message="Update via app"):
+    """Save a JSON file to GitHub repo (cloud mode)"""
+    import requests, base64
+    url = f"{GITHUB_API}/{filename}"
+    headers = {"Authorization": f"token {GITHUB_TOKEN}"} if GITHUB_TOKEN else {}
+    content_bytes = json.dumps(data, ensure_ascii=False, indent=2).encode()
+    b64 = base64.b64encode(content_bytes).decode()
+    payload = {"message": message, "content": b64}
+    try:
+        existing = requests.get(url, headers=headers, timeout=10)
+        if existing.status_code == 200:
+            payload["sha"] = existing.json()["sha"]
+        r = requests.put(url, headers=headers, json=payload, timeout=15)
+        return r.status_code in [200, 201]
+    except Exception:
+        pass
+    return False
+
 def _load(fn):
     with open(os.path.join(DATA_DIR, fn), "r", encoding="utf-8") as f:
         return json.load(f)
 
-membrane_models_raw = _load("membrane_models.json")
+# Load membrane models: cloud first, local fallback
+_raw = _cloud_load("data/membrane_models.json") if IS_CLOUD else None
+if _raw is None:
+    _raw = _load("membrane_models.json")
+membrane_models_raw = _raw
 # Load membrane models into session state for live updates
 if "membrane_models" not in st.session_state:
     st.session_state.membrane_models = membrane_models_raw[:]
 membrane_models = st.session_state.membrane_models
-chemical_data = _load("chemical_data.json")
+chemical_data = _cloud_load("data/chemical_data.json") if IS_CLOUD else None
+if chemical_data is None:
+    chemical_data = _load("chemical_data.json")
 # Pure-Python helpers (replaces pandas DataFrame operations)
 def _uq(items, key):
     """Unique sorted values for a key from list of dicts"""
@@ -47,6 +92,10 @@ def _filt_by_range(items, key, min_val, max_val):
 
 
 def _load_experiments():
+    if IS_CLOUD:
+        data = _cloud_load("data/membrane_experiments.json")
+        if data is not None:
+            return data
     exp_file = os.path.join(DATA_DIR, "membrane_experiments.json")
     if os.path.exists(exp_file):
         with open(exp_file, "r", encoding="utf-8") as f:
@@ -203,6 +252,8 @@ elif page == nav_items[1]:
             # Add any new models
             full_models.extend(edited_models.values())
             db_path = os.path.join(os.path.dirname(__file__), "data", "membrane_models.json")
+            if IS_CLOUD:
+                _cloud_save("data/membrane_models.json", full_models)
             with open(db_path, "w", encoding="utf-8") as f:
                 json.dump(full_models, f, ensure_ascii=False, indent=2)
             st.session_state.membrane_models = full_models
@@ -481,6 +532,8 @@ elif page == nav_items[10]:
                     record = {"id": len(st.session_state.experiments) + 1, "model": exp_model, "date": str(exp_date), "pressure_mpa": exp_pressure, "temperature_c": exp_temp, "solution": exp_solution, "flux_lmh": exp_flux, "duration_min": exp_duration, "permeate_ml": exp_permeate, "membrane_area_m2": exp_membrane_area, "notes": exp_notes}
                     st.session_state.experiments.append(record)
                     EXP_PATH = os.path.join(os.path.dirname(__file__), "data", "membrane_experiments.json")
+                    if IS_CLOUD:
+                        _cloud_save("data/membrane_experiments.json", st.session_state.experiments)
                     with open(EXP_PATH, "w", encoding="utf-8") as f:
                         json.dump(st.session_state.experiments, f, ensure_ascii=False, indent=2)
                     st.success(f"已记录实验: {exp_model} @ {exp_flux} LMH")
@@ -495,8 +548,10 @@ elif page == nav_items[10]:
         st.dataframe(exp_display, use_container_width=True, hide_index=True)
         if st.button("清空所有实验记录"):
             EXP_PATH = os.path.join(os.path.dirname(__file__), "data", "membrane_experiments.json")
-            with open(EXP_PATH, "w", encoding="utf-8") as f:
-                json.dump([], f)
+            if IS_CLOUD:
+            _cloud_save("data/membrane_experiments.json", [])
+        with open(EXP_PATH, "w", encoding="utf-8") as f:
+            json.dump([], f)
             st.session_state.experiments = []
             st.rerun()
     else:
