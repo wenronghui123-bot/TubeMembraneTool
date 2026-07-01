@@ -1,0 +1,73 @@
+{
+  "chemicals": [
+    {
+      "name": "NaOH（氢氧化钠）",
+      "type": "碱洗",
+      "stock_concentration": 30.0,
+      "density": 1.33,
+      "recommended_concentration": 0.5,
+      "recommended_time": 60,
+      "temperature": 40,
+      "unit": "%",
+      "notes": "用于有机污染和微生物清洗"
+    },
+    {
+      "name": "次氯酸钠（NaClO）",
+      "type": "氧化清洗",
+      "stock_concentration": 10.0,
+      "density": 1.16,
+      "recommended_concentration": 0.1,
+      "recommended_time": 30,
+      "temperature": 30,
+      "unit": "%",
+      "notes": "用于有机物和微生物清洗，注意控制温度"
+    },
+    {
+      "name": "柠檬酸",
+      "type": "酸洗",
+      "stock_concentration": 100.0,
+      "density": 1.54,
+      "recommended_concentration": 2.0,
+      "recommended_time": 60,
+      "temperature": 40,
+      "unit": "%",
+      "notes": "用于无机盐结垢清洗"
+    },
+    {
+      "name": "盐酸（HCl）",
+      "type": "酸洗",
+      "stock_concentration": 31.0,
+      "density": 1.16,
+      "recommended_concentration": 0.5,
+      "recommended_time": 30,
+      "temperature": 35,
+      "unit": "%",
+      "notes": "用于严重无机结垢，注意材质耐酸性"
+    },
+    {
+      "name": "表面活性剂",
+      "type": "辅助清洗",
+      "stock_concentration": 100.0,
+      "density": 1.0,
+      "recommended_concentration": 0.1,
+      "recommended_time": 30,
+      "temperature": 35,
+      "unit": "%",
+      "notes": "配合酸洗或碱洗使用，增强清洗效果"
+    }
+  ],
+  "pipe_dn_standard": [
+    {"dn": "DN25", "inner_diameter": 0.027, "outer_diameter": 0.0337},
+    {"dn": "DN32", "inner_diameter": 0.036, "outer_diameter": 0.0424},
+    {"dn": "DN40", "inner_diameter": 0.041, "outer_diameter": 0.0483},
+    {"dn": "DN50", "inner_diameter": 0.053, "outer_diameter": 0.0603},
+    {"dn": "DN65", "inner_diameter": 0.068, "outer_diameter": 0.0761},
+    {"dn": "DN80", "inner_diameter": 0.080, "outer_diameter": 0.0889},
+    {"dn": "DN100", "inner_diameter": 0.104, "outer_diameter": 0.1143},
+    {"dn": "DN125", "inner_diameter": 0.130, "outer_diameter": 0.1397},
+    {"dn": "DN150", "inner_diameter": 0.154, "outer_diameter": 0.1683},
+    {"dn": "DN200", "inner_diameter": 0.202, "outer_diameter": 0.2191},
+    {"dn": "DN250", "inner_diameter": 0.254, "outer_diameter": 0.2730},
+    {"dn": "DN300", "inner_diameter": 0.304, "outer_diameter": 0.3239}
+  ]
+}
