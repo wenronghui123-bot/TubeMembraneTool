@@ -549,9 +549,9 @@ elif page == nav_items[10]:
         if st.button("清空所有实验记录"):
             EXP_PATH = os.path.join(os.path.dirname(__file__), "data", "membrane_experiments.json")
             if IS_CLOUD:
-            _cloud_save("data/membrane_experiments.json", [])
-        with open(EXP_PATH, "w", encoding="utf-8") as f:
-            json.dump([], f)
+                _cloud_save("data/membrane_experiments.json", [])
+            with open(EXP_PATH, "w", encoding="utf-8") as f:
+                json.dump([], f)
             st.session_state.experiments = []
             st.rerun()
     else:
