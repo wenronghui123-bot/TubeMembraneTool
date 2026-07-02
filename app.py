@@ -6,7 +6,7 @@ import sys, os, json, math
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import streamlit as st
 from datetime import date
-st.set_page_config(page_title="管式膜计算工具_大辉哥专用版", page_icon="🔬", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="管式膜计算工具_敬业联盟专用版", page_icon="🔬", layout="wide", initial_sidebar_state="expanded")
 from core.area_calc import calculate_membrane_area, calc_module_area_from_tubes
 from core.crossflow_calc import calculate_crossflow
 from core.pressure_calc import calculate_tmp
@@ -119,7 +119,7 @@ BOM_ITEMS_DEFAULT = create_bom_from_results()
 if not st.session_state.bom_items:
     st.session_state.bom_items = BOM_ITEMS_DEFAULT
 
-st.sidebar.title("🔬 管式膜计算工具_大辉哥专用版")
+st.sidebar.title("🔬 管式膜计算工具_敬业联盟专用版")
 st.sidebar.caption("TubularMembraneDesignTool v1.0")
 st.sidebar.divider()
 
